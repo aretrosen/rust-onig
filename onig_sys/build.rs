@@ -20,14 +20,9 @@ enum LinkType {
 
 impl fmt::Display for LinkType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                &LinkType::Static => "static",
-                &LinkType::Dynamic => "dylib",
-            }
-        )
+        f.write_fmt(core::format_args!("{}",match *self {
+    LinkType::Static => "static", LinkType::Dynamic => "dylib",
+}))
     }
 }
 
@@ -37,10 +32,7 @@ fn env_var_bool(name: &str) -> Option<bool> {
     }
     env::var(name)
         .ok()
-        .map(|s| match &s.to_string().to_lowercase()[..] {
-            "0" | "no" | "false" => false,
-            _ => true,
-        })
+        .map(|s| !matches!(&s.to_string().to_lowercase()[..], "0" | "no" | "false"))
 }
 
 /// # Link Type Override
@@ -64,7 +56,7 @@ fn compile() {
 
     let mut cc = cc::Build::new();
     let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR"));
-    let ref src = Path::new("oniguruma").join("src");
+    let src = &Path::new("oniguruma").join("src");
     let config_h = out_dir.join("config.h");
 
     if env_var_bool("CARGO_FEATURE_PRINT_DEBUG").unwrap_or(false) {
@@ -121,6 +113,7 @@ fn compile() {
         .expect("Can't write config.h to OUT_DIR");
     }
     if let Ok("wasm32") = arch.as_ref().map(String::as_str) {
+        cc.include("include_wasm");
         cc.define("ONIG_DISABLE_DIRECT_THREADING", Some("1"));
         if let Ok("unknown") = os.as_ref().map(String::as_str) {
             cc.define(

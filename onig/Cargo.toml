@@ -1,6 +1,6 @@
 [package]
 name = "onig"
-version = "6.4.0"
+version = "6.4.1"
 edition = "2018"
 authors = [
     "Will Speak <will@willspeak.me>",
@@ -29,13 +29,13 @@ print-debug = ["onig_sys/print-debug"]
 generate = ["onig_sys/generate"]
 
 [dependencies]
-bitflags = "1.3"
-once_cell = "1.12"
+bitflags = "2.6"
+once_cell = "1.20"
 
 [target.'cfg(windows)'.dependencies]
 libc = "0.2"
 
 [dependencies.onig_sys]
-version = "69.8.1"
+version = "69.8.2"
 path = "../onig_sys"
 default-features = false
